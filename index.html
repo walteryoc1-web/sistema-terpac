@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA TERPAC v546.0</title>
+    <title>SISTEMA TERPAC v540.0</title>
     <style>
         :root { --verde: #ABED87; --verde-oscuro: #5a8a3d; --gris-bg: #f4f7f6; }
         body { font-family: sans-serif; background: var(--gris-bg); padding: 15px; text-align: center; margin: 0; }
@@ -29,10 +29,6 @@
         <button id="btn-env" class="btn" onclick="enviar()">REGISTRAR DATOS 🚀</button>
     </div>
 
-    <!-- EL SECRETO: Un formulario y un marco invisibles -->
-    <form id="form-airtable" method="POST" target="marco-oculto" style="display:none;"></form>
-    <iframe name="marco-oculto" style="display:none;"></iframe>
-
     <script>
         const pilotos = { "101": { n: "Juan Perez" }, "102": { n: "Pedro Marmol" } };
         function entrar() {
@@ -53,15 +49,16 @@
             btn.innerText = "Enviando..."; btn.disabled = true;
 
             const URL_WEBHOOK = 'https://hooks.airtable.com';
-            const info = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`;
-            const fecha = new Date().toLocaleString('es-ES');
+            const payload = {
+                "DATOS": `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`,
+                "FECHA": new Date().toLocaleString('es-ES')
+            };
 
-            // Enviamos los datos pegados a la URL para que Airtable los reciba sin bloqueos
-            const form = document.getElementById('form-airtable');
-            form.action = `${URL_WEBHOOK}?DATOS=${encodeURIComponent(info)}&FECHA=${encodeURIComponent(fecha)}`;
-            form.submit();
+            // MÉTODO BEACON: Envío garantizado sin bloqueos
+            const blob = new Blob([JSON.stringify(payload)], {type : 'application/json'});
+            navigator.sendBeacon(URL_WEBHOOK, blob);
 
-            alert("✅ REGISTRO ENVIADO\nAhora configura Airtable.");
+            alert("✅ REGISTRO ENVIADO\nConfigure Airtable ahora.");
             location.reload();
         }
     </script>
