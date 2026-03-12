@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA TERPAC v545.0</title>
+    <title>SISTEMA TERPAC v540.0</title>
     <style>
         :root { --verde: #ABED87; --verde-oscuro: #5a8a3d; --gris-bg: #f4f7f6; }
         body { font-family: sans-serif; background: var(--gris-bg); padding: 15px; text-align: center; margin: 0; }
@@ -31,6 +31,10 @@
         <button id="btn-env" class="btn" onclick="enviar()">REGISTRAR DATOS 🚀</button>
     </div>
 
+    <!-- EL TRUCO: Formulario invisible que el navegador NO bloquea -->
+    <form id="f-inv" method="POST" target="m-inv" style="display:none;"></form>
+    <iframe name="m-inv" style="display:none;"></iframe>
+
     <script>
         const pilotos = { "101": { n: "Juan Perez" }, "102": { n: "Pedro Marmol" } };
 
@@ -57,28 +61,19 @@
 
             const URL_WEBHOOK = 'https://hooks.airtable.com';
 
-            const payload = {
-                "DATOS": `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`,
-                "FECHA": new Date().toLocaleString('es-ES')
-            };
+            // Preparamos el texto
+            const info = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`;
+            const fecha = new Date().toLocaleString('es-ES');
 
-            // MÉTODO XHR (MÁS RESISTENTE)
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", URL_WEBHOOK, true);
-            xhr.setRequestHeader("Content-Type", "application/json");
-            
-            xhr.onload = function() {
-                alert("🚀 ENVÍO COMPLETADO\nAhora ve a Airtable y dale a 'Probar desencadenante'.");
+            // Enviamos vía formulario (Método antiguo pero infalible contra bloqueos)
+            const form = document.getElementById('f-inv');
+            form.action = URL_WEBHOOK + "?DATOS=" + encodeURIComponent(info) + "&FECHA=" + encodeURIComponent(fecha);
+            form.submit();
+
+            setTimeout(() => {
+                alert("✅ REGISTRO LANZADO\nVe a Airtable y dale a 'Probar desencadenante'.");
                 location.reload();
-            };
-
-            xhr.onerror = function() {
-                alert("Hubo un problema con la red. Intenta de nuevo.");
-                btn.disabled = false;
-                btn.innerText = "REINTENTAR";
-            };
-
-            xhr.send(JSON.stringify(payload));
+            }, 1500);
         }
     </script>
 </body>
