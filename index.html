@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA TERPAC v540.0</title>
+    <title>SISTEMA TERPAC v545.0</title>
     <style>
         :root { --verde: #ABED87; --verde-oscuro: #5a8a3d; --gris-bg: #f4f7f6; }
         body { font-family: sans-serif; background: var(--gris-bg); padding: 15px; text-align: center; margin: 0; }
@@ -44,12 +44,7 @@
         function check() {
             const id = document.getElementById('id-in').value.trim();
             const box = document.getElementById('piloto-box');
-            if(pilotos[id]) { 
-                box.innerText = "👨‍✈️ Piloto: " + pilotos[id].n; 
-                box.style.display='block'; 
-            } else { 
-                box.style.display='none'; 
-            }
+            if(pilotos[id]) { box.innerText = "👨‍✈️ Piloto: " + pilotos[id].n; box.style.display='block'; } else { box.style.display='none'; }
         }
 
         function enviar() {
@@ -60,33 +55,30 @@
             btn.innerText = "Enviando...";
             btn.disabled = true;
 
-            // URL DE TU WEBHOOK (Verificada)
-            const WEBHOOK_URL = 'https://hooks.airtable.com';
+            const URL_WEBHOOK = 'https://hooks.airtable.com';
 
             const payload = {
                 "DATOS": `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`,
                 "FECHA": new Date().toLocaleString('es-ES')
             };
 
-            // MÉTODO FETCH CON MODO INVISIBLE PARA EVITAR BLOQUEOS
-            fetch(WEBHOOK_URL, {
-                method: 'POST',
-                mode: 'no-cors', 
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(() => {
-                alert("🚀 REGISTRO LANZADO\nRegresa a Airtable y dale a 'Probar desencadenante'.");
+            // MÉTODO XHR (MÁS RESISTENTE)
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", URL_WEBHOOK, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            
+            xhr.onload = function() {
+                alert("🚀 ENVÍO COMPLETADO\nAhora ve a Airtable y dale a 'Probar desencadenante'.");
                 location.reload();
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Error de envío.");
+            };
+
+            xhr.onerror = function() {
+                alert("Hubo un problema con la red. Intenta de nuevo.");
                 btn.disabled = false;
                 btn.innerText = "REINTENTAR";
-            });
+            };
+
+            xhr.send(JSON.stringify(payload));
         }
     </script>
 </body>
