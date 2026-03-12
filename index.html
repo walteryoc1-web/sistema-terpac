@@ -63,19 +63,18 @@
 
             const textoFinal = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`;
 
-            // MÉTODO DEFINITIVO PARA GOOGLE SHEETS
+            // MÉTODO POST PARA GOOGLE SHEETS
             fetch(URL_SCRIPT, {
                 method: 'POST',
-                mode: 'no-cors', // Fundamental para saltar seguridad
-                cache: 'no-cache',
+                mode: 'no-cors', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ "datos": textoFinal })
             }).then(() => {
-                alert("✅ REGISTRO EXITOSO\nRevisa tu Google Sheet.");
+                alert("✅ REGISTRO LANZADO\nVerifica tu Google Sheet.");
                 location.reload();
             }).catch(err => {
                 console.error(err);
-                alert("Error de conexión.");
+                alert("Error al enviar.");
                 btn.disabled = false;
                 btn.innerText = "REINTENTAR";
             });
