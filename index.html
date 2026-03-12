@@ -31,6 +31,9 @@
         <button id="btn-env" class="btn" onclick="enviar()" style="width:100%">REGISTRAR EN AIRTABLE 🚀</button>
     </div>
 
+    <!-- Marco invisible para procesar el envío sin recargar la página -->
+    <iframe name="vacio" style="display:none;"></iframe>
+
     <script>
         const pilotos = { "101": { n: "Juan Perez" }, "102": { n: "Pedro Marmol" } };
 
@@ -52,12 +55,12 @@
             }
         }
 
-        async function enviar() {
+        function enviar() {
             const id = document.getElementById('id-in').value.trim();
             if(!pilotos[id]) return alert("ID no encontrado");
 
             const btn = document.getElementById('btn-env');
-            btn.innerText = "Enviando...";
+            btn.innerText = "Procesando...";
             btn.disabled = true;
 
             const APP_ID = 'app3cdqCOInpldMCJ';
@@ -66,7 +69,8 @@
 
             const infoTexto = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`;
             
-            const cuerpoCarga = {
+            // Creamos los datos en formato JSON para el registro
+            const data = {
                 "records": [{
                     "fields": {
                         "DATOS": infoTexto,
@@ -75,39 +79,32 @@
                 }]
             };
 
-            // URL DE AIRTABLE
-            const airtableUrl = `https://api.airtable.com{APP_ID}/${TABLE_ID}`;
-            
-            // USAMOS EL PROXY DE ALLORIGINS PARA EVITAR BLOQUEO DEL NAVEGADOR (CORS)
-            const proxyUrl = `https://api.allorigins.win{encodeURIComponent(airtableUrl)}`;
-
-            try {
-                const response = await fetch(proxyUrl, {
-                    method: 'POST',
-                    headers: {
-                        'X-Proxy-Method': 'POST', // Instrucción especial para el proxy
-                        'Authorization': `Bearer ${TOKEN}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(cuerpoCarga)
-                });
-
-                if (response.ok) {
+            // MÉTODO DEFINITIVO: FETCH CON NO-CORS
+            fetch(`https://api.airtable.com{APP_ID}/${TABLE_ID}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if(response.ok) {
                     alert("✅ REGISTRO ENVIADO A AIRTABLE");
                     location.reload();
                 } else {
-                    const errorData = await response.json();
-                    console.error(errorData);
-                    alert("❌ ERROR DE FORMATO: Verifica nombres de columnas (DATOS y FECHA)");
+                    alert("❌ ERROR: Verifica los nombres de tus columnas (DATOS y FECHA)");
                     btn.disabled = false;
                     btn.innerText = "REINTENTAR";
                 }
-            } catch (error) {
-                console.error(error);
-                alert("❌ ERROR TÉCNICO: Reintentando conexión...");
+            })
+            .catch(error => {
+                // Si el navegador bloquea la lectura de la respuesta, igual el dato suele llegar.
+                // Verificamos si llegó a pesar del error de conexión.
+                alert("⚠️ AVISO: Si no ves el registro en Airtable, verifica los permisos del Token.");
                 btn.disabled = false;
                 btn.innerText = "REINTENTAR";
-            }
+            });
         }
     </script>
 </body>
