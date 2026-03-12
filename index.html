@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA TERPAC v541.0</title>
+    <title>SISTEMA TERPAC v540.0</title>
     <style>
         :root { --verde: #ABED87; --verde-oscuro: #5a8a3d; --gris-bg: #f4f7f6; }
         body { font-family: sans-serif; background: var(--gris-bg); padding: 15px; text-align: center; margin: 0; }
@@ -31,9 +31,6 @@
         <button id="btn-env" class="btn" onclick="enviar()">REGISTRAR EN AIRTABLE 🚀</button>
     </div>
 
-    <!-- ESTO ES LO QUE HACE QUE FUNCIONE: UN FORMULARIO INVISIBLE -->
-    <form id="airtable-form" style="display:none;"></form>
-
     <script>
         const pilotos = { "101": { n: "Juan Perez" }, "102": { n: "Pedro Marmol" } };
 
@@ -60,41 +57,54 @@
             if(!pilotos[id]) return alert("ID no encontrado");
 
             const btn = document.getElementById('btn-env');
-            btn.innerText = "Procesando...";
+            btn.innerText = "Enviando...";
             btn.disabled = true;
 
             const APP_ID = 'app3cdqCOInpldMCJ';
             const TABLE_ID = 'tblElQcwWk5BvQiX8';
             const TOKEN = 'pat4AVN7AOIYp9iCj.c6b58fa271e8e07e6291d08b2c6a1e0d54a49166ff80ef7a0fb73f1b4aefd55c';
 
-            const infoTexto = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`;
+            const info = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`;
             
-            const datos = {
+            // Enviamos los datos con los nombres de columna EXACTOS
+            const data = {
                 "records": [{
                     "fields": {
-                        "DATOS": infoTexto,
+                        "DATOS": info,
                         "FECHA": new Date().toISOString()
                     }
                 }]
             };
 
-            // USAMOS XMLHttpRequest PARA EVITAR BLOQUEOS CORS
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", `https://api.airtable.com{APP_ID}/${TABLE_ID}`, true);
-            xhr.setRequestHeader("Authorization", "Bearer " + TOKEN);
-            xhr.setRequestHeader("Content-Type", "application/json");
+            try {
+                const response = await fetch(`https://api.airtable.com{APP_ID}/${TABLE_ID}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
 
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    // No importa si el navegador dice error, si llegó a Airtable está bien
-                    alert("🚀 PROCESO COMPLETADO\nRevise su Airtable.");
+                const resJSON = await response.json();
+
+                if (response.ok) {
+                    alert("✅ ¡LOGRADO! El dato ya está en Airtable.");
                     location.reload();
+                } else {
+                    // Si Airtable rechaza el dato, aquí nos dirá POR QUÉ
+                    console.error(resJSON);
+                    alert("❌ AIRTABLE RECHAZÓ EL DATO:\n" + (resJSON.error.message || resJSON.error.type));
+                    btn.disabled = false;
+                    btn.innerText = "REINTENTAR";
                 }
-            };
-
-            xhr.send(JSON.stringify(datos));
+            } catch (err) {
+                // Si el navegador bloquea la respuesta (CORS), lanzamos aviso ciego
+                alert("⚠️ EL NAVEGADOR BLOQUEÓ LA RESPUESTA.\nRevise su Airtable ahora; si no hay nada, el Token o los nombres de columna están mal.");
+                btn.disabled = false;
+                btn.innerText = "REINTENTAR";
+            }
         }
     </script>
 </body>
 </html>
-
