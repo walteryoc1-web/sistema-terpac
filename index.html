@@ -60,7 +60,7 @@
             btn.innerText = "Enviando...";
             btn.disabled = true;
 
-            // URL DE TU WEBHOOK DE AIRTABLE
+            // URL DE TU WEBHOOK (Verificada)
             const WEBHOOK_URL = 'https://hooks.airtable.com';
 
             const payload = {
@@ -68,13 +68,25 @@
                 "FECHA": new Date().toLocaleString('es-ES')
             };
 
-            // MÉTODO BEACON: Envío garantizado sin bloqueos CORS
-            const blob = new Blob([JSON.stringify(payload)], {type : 'application/json'});
-            navigator.sendBeacon(WEBHOOK_URL, blob);
-
-            // Avisamos al usuario
-            alert("🚀 REGISTRO LANZADO CON ÉXITO\nAhora regresa a Airtable y dale a 'Probar desencadenante'.");
-            location.reload();
+            // MÉTODO FETCH CON MODO INVISIBLE PARA EVITAR BLOQUEOS
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                alert("🚀 REGISTRO LANZADO\nRegresa a Airtable y dale a 'Probar desencadenante'.");
+                location.reload();
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error de envío.");
+                btn.disabled = false;
+                btn.innerText = "REINTENTAR";
+            });
         }
     </script>
 </body>
