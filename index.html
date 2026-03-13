@@ -6,46 +6,92 @@
     <title>SISTEMA TERPAC LTDA</title>
     <style>
         :root { --verde: #ABED87; --verde-oscuro: #5a8a3d; --gris-bg: #f4f7f6; --azul-reloj: #3498db; }
-        body { font-family: sans-serif; background: var(--gris-bg); padding: 10px; text-align: center; margin: 0; }
+        body { font-family: sans-serif; background: var(--gris-bg); padding: 0; margin: 0; text-align: center; }
         
-        /* TARJETA QUE ABARCA MÁS ANCHO */
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 95%; max-width: 600px; margin: 10px auto; border-top: 8px solid var(--verde); }
+        /* CONTENEDOR PRINCIPAL QUE ABARCA TODO EL ANCHO */
+        .card { 
+            background: white; 
+            padding: 20px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+            width: 100%; 
+            min-height: 100vh; /* Para que ocupe todo el alto si es necesario */
+            margin: 0; 
+            border-top: 8px solid var(--verde); 
+            box-sizing: border-box;
+        }
+
+        /* Ajuste para el Login y Operador (estos sí se ven mejor centrados) */
+        .compact-card { 
+            max-width: 400px; 
+            margin: 50px auto; 
+            border-radius: 20px; 
+            min-height: auto;
+        }
         
         input, select { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
         .btn { background: var(--verde); border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; color: #333; font-size: 16px; }
-        .btn-salir { background: #ff6b6b; color: white; margin-top: 20px; padding: 12px; font-size: 14px; width: 100%; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-salir { background: #ff6b6b; color: white; margin-top: 20px; padding: 12px; font-size: 14px; width: 100%; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; max-width: 300px; }
         
         #piloto-box { font-weight: bold; color: var(--verde-oscuro); margin: 10px 0; display: none; padding: 15px; background: #f0fdf0; border-radius: 10px; border: 1px dashed var(--verde); text-align: left; }
 
-        /* PILDORAS HORIZONTALES */
-        .pildoras-horizontal { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 20px; }
-        .pildora { background: white; padding: 10px 5px; border-radius: 12px; flex: 1; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-bottom: 5px solid var(--verde-oscuro); }
-        .pildora h3 { font-size: 9px; margin: 0 0 5px 0; color: #777; text-transform: uppercase; line-height: 1.1; height: 20px; display: flex; align-items: center; justify-content: center; }
-        .pildora p { font-size: 22px; font-weight: bold; margin: 0; color: #222; }
+        /* PILDORAS HORIZONTALES - AHORA MÁS GRANDES */
+        .pildoras-horizontal { 
+            display: flex; 
+            justify-content: space-around; 
+            gap: 15px; 
+            margin-bottom: 25px; 
+            flex-wrap: wrap; /* Para que en celular no se amontonen */
+        }
+        .pildora { 
+            background: white; 
+            padding: 20px 10px; 
+            border-radius: 15px; 
+            flex: 1; 
+            min-width: 150px; 
+            text-align: center; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            border-bottom: 8px solid var(--verde-oscuro); 
+        }
+        .pildora h3 { font-size: 14px; margin: 0 0 10px 0; color: #777; text-transform: uppercase; }
+        .pildora p { font-size: 35px; font-weight: bold; margin: 0; color: #222; }
         
-        /* RELOJ AZUL ARRIBA DE GRÁFICA */
-        .reloj-container { margin: 15px 0 5px 0; display: flex; justify-content: space-between; align-items: center; padding: 0 5px; }
-        #reloj { font-size: 18px; font-weight: bold; color: white; background: var(--azul-reloj); padding: 5px 15px; border-radius: 20px; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3); }
-        #fecha-actual { font-size: 12px; color: #777; font-weight: bold; text-transform: capitalize; }
+        /* RELOJ Y FECHA */
+        .reloj-container { margin: 20px 0; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        #reloj { font-size: 24px; font-weight: bold; color: white; background: var(--azul-reloj); padding: 8px 20px; border-radius: 30px; }
+        #fecha-actual { font-size: 16px; color: #555; font-weight: bold; text-transform: capitalize; }
 
-        /* CONTENEDOR GRÁFICA */
-        #contenedor-grafica { width: 100%; height: 180px; background: #fdfdfd; border: 2px solid #eee; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #bbb; font-size: 13px; }
+        /* CONTENEDOR GRÁFICA AL 100% */
+        #contenedor-grafica { 
+            width: 100%; 
+            height: 350px; /* Más alta para que luzca en pantalla grande */
+            background: #fdfdfd; 
+            border: 2px solid #eee; 
+            border-radius: 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #bbb; 
+            font-size: 18px; 
+            margin-top: 10px;
+        }
 
-        .live-status { color: #2ecc71; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 6px; justify-content: center; margin-bottom: 15px; }
-        .dot { width: 7px; height: 7px; background: #2ecc71; border-radius: 50%; animation: pulse 2s infinite; }
+        .live-status { color: #2ecc71; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; justify-content: center; margin: 20px 0; }
+        .dot { width: 10px; height: 10px; background: #2ecc71; border-radius: 50%; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="login" class="card" style="max-width:350px;">
+    <!-- LOGIN -->
+    <div id="login" class="card compact-card">
         <h2 style="color:var(--verde-oscuro); margin-top:0;">TERPAC LOGIN</h2>
         <input type="text" id="u" placeholder="Usuario">
         <input type="password" id="p" placeholder="Contraseña">
         <button class="btn" onclick="entrar()">INGRESAR</button>
     </div>
 
-    <div id="ui-app" class="card" style="display:none; max-width:400px;">
+    <!-- OPERADOR -->
+    <div id="ui-app" class="card compact-card" style="display:none;">
         <h3 style="margin-top:0; color:var(--verde-oscuro);">Captura Terpac</h3>
         <input type="text" id="id-in" placeholder="ID PILOTO" oninput="check()">
         <div id="piloto-box"></div>
@@ -55,20 +101,21 @@
         <button class="btn-salir" onclick="location.reload()">CERRAR SESIÓN</button>
     </div>
 
+    <!-- SUPERVISOR FULL WIDTH -->
     <div id="ui-supervisor" class="card" style="display:none;">
-        <div class="live-status"><div class="dot"></div> MONITOR TERPAC - PUERTO QUETZAL</div>
+        <div class="live-status"><div class="dot"></div> MONITOR TERPAC - PUERTO QUETZAL (CONTROL DE RENDIMIENTO)</div>
         
         <div class="pildoras-horizontal">
             <div class="pildora" style="border-bottom-color: #f1c40f;">
-                <h3>Pendiente<br>Ingreso</h3>
+                <h3>Pendiente Ingreso</h3>
                 <p>08</p>
             </div>
             <div class="pildora" style="border-bottom-color: #3498db;">
-                <h3>En Proceso<br>Carga</h3>
+                <h3>En Proceso Carga</h3>
                 <p>04</p>
             </div>
             <div class="pildora" style="border-bottom-color: #2ecc71;">
-                <h3>Total<br>Despachadas</h3>
+                <h3>Total Despachadas</h3>
                 <p>12</p>
             </div>
         </div>
@@ -78,9 +125,9 @@
             <div id="reloj">00:00:00</div>
         </div>
 
-        <div id="contenedor-grafica">Área reservada para Gráfica de Rendimiento</div>
+        <div id="contenedor-grafica">Espacio para Gráfica de Análisis de Datos</div>
 
-        <button class="btn-salir" onclick="location.reload()">SALIR AL LOGIN</button>
+        <button class="btn-salir" onclick="location.reload()">SALIR AL PANEL DE CONTROL</button>
     </div>
 
     <script>
@@ -90,6 +137,7 @@
             const user = document.getElementById('u').value.toLowerCase().trim();
             const pass = document.getElementById('p').value;
             if(user == "operador 1" && pass == "terpac1") {
+                document.getElementById('login').classList.remove('compact-card'); // Reset para consistencia
                 document.getElementById('login').style.display='none'; 
                 document.getElementById('ui-app').style.display='block';
             } 
@@ -105,7 +153,7 @@
             setInterval(() => {
                 const ahora = new Date();
                 document.getElementById('reloj').innerText = ahora.toLocaleTimeString('es-GT', { hour12: false });
-                document.getElementById('fecha-actual').innerText = ahora.toLocaleDateString('es-GT', { weekday: 'short', day: 'numeric', month: 'short' });
+                document.getElementById('fecha-actual').innerText = ahora.toLocaleDateString('es-GT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
             }, 1000);
         }
 
