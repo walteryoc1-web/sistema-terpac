@@ -44,8 +44,8 @@
         <div id="piloto-box" class="info-box"></div>
         
         <select id="mov">
-            <option>Arribo</option><option>Entrada</option>
-            <option>Control 1</option><option>Salida</option>
+            <option>1) Arribo</option><option>2) Entrada</option>
+            <option>3) Control 1</option><option>4) Salida</option>
         </select>
 
         <select id="prod-select">
@@ -110,13 +110,16 @@
             } else if(user == "supervisor 1" && pass == "terpac2") {
                 document.getElementById('login').style.display='none'; 
                 document.getElementById('ui-supervisor').style.display='block';
-                iniciarReloj(); actualizarPildoras();
+                iniciarReloj(); 
+                actualizarPildoras();
+                setInterval(actualizarPildoras, 15000); // Auto-actualizar cada 15 segundos
             } else { alert("Acceso Incorrecto"); }
         }
 
         async function actualizarPildoras() {
             try {
-                const response = await fetch(URL_SCRIPT);
+                // Parche anti-caché: agregamos un timestamp único al final de la URL
+                const response = await fetch(URL_SCRIPT + "?t=" + new Date().getTime());
                 const data = await response.json();
                 document.getElementById('count-pendientes').innerText = data.pendientes.toString().padStart(2, '0');
                 document.getElementById('count-proceso').innerText = data.proceso.toString().padStart(2, '0');
@@ -143,7 +146,6 @@
         function enviar() {
             const id = document.getElementById('id-in').value.trim();
             const prod = document.getElementById('prod-select').value;
-            
             if(!pilotos[id]) return alert("ID Piloto no válido");
             if(!prod) return alert("Seleccione un Producto");
 
