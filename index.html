@@ -2,40 +2,43 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- BLOQUE ANTI-CACHÉ PARA MOZILLA Y EDGE -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SISTEMA TERPAC LTDA</title>
     <style>
         :root { --verde: #ABED87; --verde-oscuro: #5a8a3d; --gris-bg: #f4f7f6; --azul-reloj: #3498db; }
         body { font-family: sans-serif; background: var(--gris-bg); padding: 0; margin: 0; text-align: center; }
+        
         .card-compacta { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 90%; max-width: 400px; margin: 50px auto; border-top: 8px solid var(--verde); box-sizing: border-box; }
         .card-full { background: white; padding: 20px; width: 100%; min-height: 100vh; margin: 0; border-top: 8px solid var(--verde); box-sizing: border-box; display: none; text-align: center; }
+        
         input, select { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
         .btn { background: var(--verde); border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; color: #333; font-size: 16px; }
         .btn-salir { background: #ff6b6b; color: white; margin-top: 20px; padding: 12px; font-size: 14px; width: 100%; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; max-width: 300px; }
+        
         #piloto-box { font-weight: bold; color: var(--verde-oscuro); margin: 10px 0; display: none; padding: 15px; background: #f0fdf0; border-radius: 10px; border: 1px dashed var(--verde); text-align: left; }
+
         .pildoras-horizontal { display: flex; justify-content: space-around; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; padding: 0 10px; }
         .pildora { background: white; padding: 20px 10px; border-radius: 15px; flex: 1; min-width: 150px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-bottom: 8px solid var(--verde-oscuro); }
         .pildora h3 { font-size: 14px; margin: 0 0 10px 0; color: #777; text-transform: uppercase; }
         .pildora p { font-size: 35px; font-weight: bold; margin: 0; color: #222; }
+        
         .reloj-container { margin: 20px 0 10px 0; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
         #reloj { font-size: 24px; font-weight: bold; color: white; background: var(--azul-reloj); padding: 8px 20px; border-radius: 30px; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
         #fecha-actual { font-size: 16px; color: #555; font-weight: bold; text-transform: capitalize; }
+
         #contenedor-grafica { width: 100%; height: 350px; background: #fdfdfd; border: 2px solid #eee; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #bbb; font-size: 18px; margin-top: 10px; }
+
         .live-status { color: #2ecc71; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; justify-content: center; margin: 5px 0 20px 0; }
         .dot { width: 10px; height: 10px; background: #2ecc71; border-radius: 50%; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        
         .subtitulo-plus { font-size: 12px; color: #888; letter-spacing: 2px; font-weight: bold; margin-bottom: 15px; }
         #login .subtitulo-plus, #ui-app .subtitulo-plus { margin-top: -10px; }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN -->
+    <!-- PANTALLA LOGIN -->
     <div id="login" class="card-compacta">
         <h2 style="color:var(--verde-oscuro); margin-top:0; margin-bottom:5px;">TERPAC USUARIO</h2>
         <div class="subtitulo-plus">SEW-CONTROL PLUS</div>
@@ -44,52 +47,70 @@
         <button class="btn" onclick="entrar()">INGRESAR</button>
     </div>
 
-    <!-- OPERADOR -->
+    <!-- PANTALLA OPERADOR -->
     <div id="ui-app" class="card-compacta" style="display:none;">
         <h3 style="margin-top:0; margin-bottom:5px; color:var(--verde-oscuro);">Captura Terpac</h3>
         <div class="subtitulo-plus">SEW-CONTROL PLUS</div>
         <input type="text" id="id-in" placeholder="ID PILOTO" oninput="check()">
         <div id="piloto-box"></div>
-        <select id="mov"><option>1) Arribo</option><option>2) Entrada</option><option>3) Control 1</option><option>4) Salida</option></select>
-        <select id="prod"><option>SBM</option><option>YC (USA)</option><option>SWW</option></select>
+        
+        <select id="mov">
+            <option>1) Arribo</option>
+            <option>2) Entrada</option>
+            <option>3) Control 1</option>
+            <option>4) Salida</option>
+        </select>
+
+        <select id="prod">
+            <option>SBM</option>
+            <option>YC (USA)</option>
+            <option>SWW</option>
+        </select>
+        
         <button id="btn-env" class="btn" onclick="enviar()">REGISTRAR DATOS 🚀</button>
         <button class="btn-salir" onclick="location.reload()">CERRAR SESIÓN</button>
     </div>
 
-    <!-- SUPERVISOR -->
+    <!-- PANTALLA SUPERVISOR -->
     <div id="ui-supervisor" class="card-full">
         <div class="subtitulo-plus" style="margin-top: 10px; margin-bottom: 5px;">SEW-CONTROL PLUS</div>
         <div class="live-status"><div class="dot"></div> MONITOR TERPAC - PUERTO QUETZAL (EN VIVO)</div>
+        
         <div class="pildoras-horizontal">
             <div class="pildora" style="border-bottom-color: #f1c40f;"><h3>Pendiente Ingreso</h3><p id="count-pendientes">00</p></div>
             <div class="pildora" style="border-bottom-color: #3498db;"><h3>En Proceso Carga</h3><p id="count-proceso">00</p></div>
             <div class="pildora" style="border-bottom-color: #2ecc71;"><h3>Total Despachadas</h3><p id="count-despachadas">00</p></div>
         </div>
+
         <div class="reloj-container">
             <div id="fecha-actual">Cargando...</div>
             <div id="reloj">00:00:00</div>
         </div>
+
         <div id="contenedor-grafica">Área para Gráfica de Rendimiento Logístico</div>
+
         <button class="btn-salir" onclick="location.reload()">SALIR AL PANEL</button>
     </div>
 
     <script>
         const pilotos = { "101": { n: "Juan Perez" }, "102": { n: "Pedro Marmol" } };
-        // Truco: Agregamos un número aleatorio a la URL para forzar la descarga del script
-        const URL_SCRIPT = 'https://script.google.com' + new Date().getTime();
+        const URL_SCRIPT = 'https://script.google.com';
 
         function entrar() {
             const user = document.getElementById('u').value.toLowerCase().trim();
             const pass = document.getElementById('p').value;
+
             if(user == "operador 1" && pass == "terpac1") {
                 document.getElementById('login').style.display='none'; 
                 document.getElementById('ui-app').style.display='block';
-            } else if(user == "supervisor 1" && pass == "terpac2") {
+            } 
+            else if(user == "supervisor 1" && pass == "terpac2") {
                 document.getElementById('login').style.display='none'; 
                 document.getElementById('ui-supervisor').style.display='block';
                 iniciarReloj();
                 actualizarPildoras();
-            } else { alert("Acceso Incorrecto"); }
+            }
+            else { alert("Acceso Incorrecto"); }
         }
 
         async function actualizarPildoras() {
@@ -99,7 +120,7 @@
                 document.getElementById('count-pendientes').innerText = data.pendientes.toString().padStart(2, '0');
                 document.getElementById('count-proceso').innerText = data.proceso.toString().padStart(2, '0');
                 document.getElementById('count-despachadas').innerText = data.despachadas.toString().padStart(2, '0');
-            } catch (e) { console.log("Error sincronizando..."); }
+            } catch (e) { console.log("Error sincronizando pildoras"); }
         }
 
         function iniciarReloj() {
@@ -123,14 +144,23 @@
             const mov = document.getElementById('mov').value;
             const prod = document.getElementById('prod').value;
             const textoFinal = `${mov} | ID: ${id} | Piloto: ${pilotos[id].n} | Prod: ${prod}`;
+
             btn.innerText = "Enviando..."; btn.disabled = true;
+
             try {
-                await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: textoFinal });
+                await fetch(URL_SCRIPT, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: textoFinal
+                });
                 alert("✅ REGISTRO EXITOSO");
                 document.getElementById('id-in').value = "";
                 document.getElementById('piloto-box').style.display = 'none';
-            } catch (error) { alert("Error de conexión"); } finally {
-                btn.innerText = "REGISTRAR DATOS 🚀"; btn.disabled = false;
+            } catch (error) {
+                alert("Error de conexión");
+            } finally {
+                btn.innerText = "REGISTRAR DATOS 🚀";
+                btn.disabled = false;
             }
         }
     </script>
