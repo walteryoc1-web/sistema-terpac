@@ -31,19 +31,24 @@
         .live-status { color: #2ecc71; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; justify-content: center; margin: 20px 0; }
         .dot { width: 10px; height: 10px; background: #2ecc71; border-radius: 50%; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* Estilo para los nuevos subtitulos */
+        .sub-plus { font-size: 12px; color: #888; font-weight: bold; letter-spacing: 1px; margin-top: -10px; margin-bottom: 15px; display: block; }
     </style>
 </head>
 <body>
 
     <div id="login" class="card-compacta">
-        <h2 style="color:var(--verde-oscuro); margin-top:0;">TERPAC USUARIO</h2>
+        <h2 style="color:var(--verde-oscuro); margin-top:0; margin-bottom:5px;">TERPAC USUARIO</h2>
+        <span class="sub-plus">SEW-CONTROL PLUS</span>
         <input type="text" id="u" placeholder="Usuario">
         <input type="password" id="p" placeholder="Contraseña">
         <button class="btn" onclick="entrar()">INGRESAR</button>
     </div>
 
     <div id="ui-app" class="card-compacta" style="display:none;">
-        <h3 style="margin-top:0; color:var(--verde-oscuro);">Captura Terpac</h3>
+        <h3 style="margin-top:0; margin-bottom:5px; color:var(--verde-oscuro);">Captura Terpac</h3>
+        <span class="sub-plus">SEW-CONTROL PLUS</span>
         <input type="text" id="id-in" placeholder="ID PILOTO" oninput="check()">
         <div id="piloto-box"></div>
         
@@ -65,6 +70,7 @@
     </div>
 
     <div id="ui-supervisor" class="card-full">
+        <span class="sub-plus" style="margin-top:10px; margin-bottom:0;">SEW-CONTROL PLUS</span>
         <div class="live-status"><div class="dot"></div> MONITOR TERPAC - PUERTO QUETZAL (EN VIVO)</div>
         
         <div class="pildoras-horizontal">
@@ -136,18 +142,23 @@
             const btn = document.getElementById('btn-env');
             btn.innerText = "Enviando..."; btn.disabled = true;
 
-            const textoFinal = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`;
+            const mov = document.getElementById('mov').value;
+            const prod = document.getElementById('prod').value;
+            const textoFinal = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${mov} | Prod: ${prod}`;
 
             fetch(URL_SCRIPT, {
                 method: 'POST',
-                mode: 'no-cors', 
-                body: JSON.stringify({ "datos": textoFinal })
+                mode: 'no-cors',
+                body: textoFinal
             }).then(() => {
-                alert("✅ REGISTRO ENVIADO");
-                location.reload();
-            }).catch(err => {
-                alert("Error de envío.");
-                btn.disabled = false; btn.innerText = "REINTENTAR";
+                alert("✅ Registro Exitoso");
+                document.getElementById('id-in').value = "";
+                document.getElementById('piloto-box').style.display='none';
+            }).catch(() => {
+                alert("Error de envío");
+            }).finally(() => {
+                btn.innerText = "REGISTRAR DATOS 🚀";
+                btn.disabled = false;
             });
         }
     </script>
