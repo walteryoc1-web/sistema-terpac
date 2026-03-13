@@ -3,84 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA TERPAC LTDA</title>
+    <title>SWE-CONTROL PLUS</title>
     <style>
-        :root { --verde: #ABED87; --verde-oscuro: #5a8a3d; --gris-bg: #f4f7f6; }
-        body { font-family: sans-serif; background: var(--gris-bg); padding: 15px; text-align: center; margin: 0; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); max-width: 400px; margin: 20px auto; border-top: 8px solid var(--verde); }
-        input, select { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
-        .btn { background: var(--verde); border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; color: #333; font-size: 16px; }
-        #piloto-box { font-weight: bold; color: var(--verde-oscuro); margin: 10px 0; display: none; padding: 15px; background: #f0fdf0; border-radius: 10px; border: 1px dashed var(--verde); text-align: left; }
+        :root { --verde: #ABED87; --verde-oscuro: #5a8a3d; --gris-bg: #f4f7f6; --blanco: #ffffff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--gris-bg); padding: 15px; margin: 0; display: flex; justify-content: center; }
+        
+        .card { background: var(--blanco); padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 400px; border-top: 10px solid var(--verde); position: relative; overflow: hidden; }
+        
+        /* CABECERA Y STATUS */
+        .live-status { color: #2ecc71; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .dot { width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.3; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* TITULOS */
+        h2 { color: var(--verde-oscuro); margin: 0 0 10px 0; font-size: 24px; text-align: center; }
+        .titulos-seccion { font-size: 12px; font-weight: bold; color: #888; text-transform: uppercase; margin: 25px 0 10px 0; border-left: 4px solid var(--verde-oscuro); padding-left: 10px; text-align: left; }
+
+        /* INPUTS Y SELECTS */
+        input, select { width: 100%; padding: 16px; margin: 8px 0; border-radius: 15px; border: 1px solid #eee; font-size: 16px; background: #f9f9f9; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: var(--verde); outline: none; background: white; }
+
+        /* BOTONES */
+        .btn { background: var(--verde); border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; color: #333; font-size: 16px; box-shadow: 0 4px 15px rgba(171, 237, 135, 0.4); margin-top: 10px; }
+        .btn:active { transform: scale(0.96); }
+        .btn-logout { background: none; border: none; color: #ff5e5e; font-size: 13px; font-weight: bold; margin-top: 30px; cursor: pointer; text-decoration: underline; width: 100%; }
+
+        /* PILDORAS SUPERVISOR */
+        .pildoras { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+        .pildora { background: #fff; padding: 15px; border-radius: 20px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border-left: 6px solid var(--verde-oscuro); }
+        .pildora h3 { font-size: 10px; margin: 0; color: #999; text-transform: uppercase; }
+        .pildora p { font-size: 22px; font-weight: bold; margin: 5px 0 0 0; color: #333; }
+
+        /* BOX PILOTO DETECTADO */
+        #piloto-box { margin: 10px 0; display: none; padding: 15px; background: #f0fdf0; border-radius: 15px; border: 1px solid var(--verde); text-align: left; }
+        .piloto-label { font-size: 10px; color: #777; text-transform: uppercase; display: block; }
+        .piloto-nombre { font-size: 18px; font-weight: bold; color: var(--verde-oscuro); }
+
+        /* LISTA HISTORIAL */
+        .evento { background: #fdfdfd; padding: 12px; border-radius: 12px; margin-bottom: 8px; border-bottom: 1px solid #eee; text-align: left; font-size: 13px; }
+        .evento span { color: #aaa; font-weight: bold; margin-right: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="login" class="card">
-        <h2 style="color:var(--verde-oscuro); margin-top:0;">TERPAC USUARIO</h2>
+    <!-- PANTALLA 1: LOGIN -->
+    <div id="pantalla-login" class="card">
+        <h2>SWE-CONTROL</h2>
+        <p style="color:#888; font-size: 14px; margin-bottom: 25px; text-align: center;">Acceso al Sistema Portuario</p>
         <input type="text" id="u" placeholder="Usuario">
         <input type="password" id="p" placeholder="Contraseña">
-        <button class="btn" onclick="entrar()">INGRESAR</button>
+        <button class="btn" onclick="entrar()">INICIAR SESIÓN</button>
     </div>
 
-    <div id="ui-app" class="card" style="display:none;">
-        <h3 style="margin-top:0; color:var(--verde-oscuro);">Captura Terpac</h3>
-        <input type="text" id="id-in" placeholder="ID PILOTO (101, 102)" oninput="check()">
-        <div id="piloto-box"></div>
-        <select id="mov"><option>Arribo</option><option>Entrada</option><option>Salida</option></select>
-        <select id="prod"><option>SBM</option><option>YC (USA)</option><option>SWW</option></select>
-        <button id="btn-env" class="btn" onclick="enviar()">REGISTRAR DATOS 🚀</button>
+    <!-- PANTALLA 2: OPERADOR -->
+    <div id="pantalla-operador" class="card" style="display:none;">
+        <div class="live-status"><div class="dot"></div> REGISTRO EN VIVO</div>
+        <h2>Captura Operativa</h2>
+        
+        <div class="titulos-seccion">Identificación</div>
+        <input type="number" id="id-in" placeholder="ID DEL PILOTO" oninput="check()">
+        
+        <div id="piloto-box">
+            <span class="piloto-label">Piloto Identificado:</span>
+            <span class="piloto-nombre" id="nombre-piloto-txt"></span>
+        </div>
+
+        <div class="titulos-seccion">Detalles de Carga</div>
+        <select id="mov">
+            <option value="" disabled selected>Seleccionar Movimiento</option>
+            <option>1) Arribo</option>
+            <option>2) Entrada</option>
+            <option>3) Salida</option>
+        </select>
+        
+        <select id="prod">
+            <option value="" disabled selected>Producto</option>
+            <option>SBM</option>
+            <option>YC (USA)</option>
+            <option>SWW</option>
+        </select>
+
+        <button id="btn-env" class="btn" onclick="enviar()">REGISTRAR EN SHEET 🚀</button>
+        <button class="btn-logout" onclick="location.reload()">SALIR DEL SISTEMA</button>
+    </div>
+
+    <!-- PANTALLA 3: SUPERVISOR -->
+    <div id="pantalla-supervisor" class="card" style="display:none;">
+        <div class="live-status"><div class="dot"></div> DASHBOARD DE CONTROL</div>
+        <h2>Panel Supervisor</h2>
+
+        <div class="titulos-seccion">Indicadores Hoy</div>
+        <div class="pildoras">
+            <div class="pildora"><h3>Pilotos</h3><p>14</p></div>
+            <div class="pildora" style="border-left-color: #f39c12;"><h3>En Proceso</h3><p>03</p></div>
+            <div class="pildora" style="border-left-color: #3498db;"><h3>Cargas</h3><p>42</p></div>
+            <div class="pildora" style="border-left-color: #e74c3c;"><h3>Alertas</h3><p>0</p></div>
+        </div>
+
+        <div class="titulos-seccion">Historial Reciente</div>
+        <div id="historial">
+            <div class="evento"><span>10:45</span> ID 101 - Juan Perez - Entrada</div>
+            <div class="evento"><span>10:32</span> ID 104 - Carlos Ruiz - Salida</div>
+            <div class="evento"><span>10:15</span> ID 101 - Juan Perez - Arribo</div>
+        </div>
+
+        <button class="btn" onclick="location.reload()" style="background:#f0f0f0; color:#333; margin-top:20px; box-shadow:none;">CERRAR PANEL</button>
     </div>
 
     <script>
-        const pilotos = { "101": { n: "Juan Perez" }, "102": { n: "Pedro Marmol" } };
+        const pilotos = { 
+            "101": { n: "Juan Perez" }, 
+            "102": { n: "Pedro Marmol" },
+            "103": { n: "Mario Lopez" },
+            "104": { n: "Carlos Ruiz" }
+        };
 
         function entrar() {
-            if(document.getElementById('u').value.toLowerCase().trim()=="operador 1" && document.getElementById('p').value=="terpac1") {
-                document.getElementById('login').style.display='none'; 
-                document.getElementById('ui-app').style.display='block';
-            } else { alert("Acceso Incorrecto"); }
+            const user = document.getElementById('u').value.toLowerCase().trim();
+            const pass = document.getElementById('p').value;
+            if(user == "op1" && pass == "terpac1") {
+                document.getElementById('pantalla-login').style.display = 'none';
+                document.getElementById('pantalla-operador').style.display = 'block';
+            } else if(user == "super1" && pass == "super123") {
+                document.getElementById('pantalla-login').style.display = 'none';
+                document.getElementById('pantalla-supervisor').style.display = 'block';
+            } else { alert("Usuario o Clave Incorrecta"); }
         }
 
         function check() {
             const id = document.getElementById('id-in').value.trim();
             const box = document.getElementById('piloto-box');
+            const txt = document.getElementById('nombre-piloto-txt');
             if(pilotos[id]) { 
-                box.innerText = "👨‍✈️ Piloto: " + pilotos[id].n; 
+                txt.innerText = pilotos[id].n; 
                 box.style.display='block'; 
             } else { box.style.display='none'; }
         }
 
-        function enviar() {
+        async function enviar() {
             const id = document.getElementById('id-in').value.trim();
-            if(!pilotos[id]) return alert("ID no encontrado");
+            const mov = document.getElementById('mov').value;
+            const prod = document.getElementById('prod').value;
 
+            if(!pilotos[id]) return alert("ID no válido");
+            if(!mov || !prod) return alert("Completa todos los campos");
+            
             const btn = document.getElementById('btn-env');
-            btn.innerText = "Enviando...";
-            btn.disabled = true;
+            btn.innerText = "PROCESANDO..."; btn.disabled = true;
 
-            // TU NUEVA URL DE GOOGLE APPS SCRIPT
-            const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbxYMpx1428fTz4g7esBgP5WLHFkm9kSZaIQjUFjDgGoMBMt5Emb1pSamzDOauCt7mE/exec';
+            const URL_SCRIPT = 'https://script.google.com';
+            const textoFinal = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${mov} | Prod: ${prod}`;
 
-            const textoFinal = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`;
-
-            // MÉTODO POST PARA GOOGLE SHEETS
-            fetch(URL_SCRIPT, {
-                method: 'POST',
-                mode: 'no-cors', 
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ "datos": textoFinal })
-            }).then(() => {
-                alert("✅ REGISTRO ENVIADO");
+            try {
+                await fetch(URL_SCRIPT, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ "datos": textoFinal })
+                });
+                alert("✅ REGISTRO GUARDADO");
                 location.reload();
-            }).catch(err => {
-                console.error(err);
-                alert("Error de envío.");
-                btn.disabled = false;
-                btn.innerText = "REINTENTAR";
-            });
+            } catch(e) {
+                alert("Error al enviar");
+                btn.disabled = false; btn.innerText = "REGISTRAR EN SHEET 🚀";
+            }
         }
     </script>
 </body>
 </html>
-
-
