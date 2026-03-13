@@ -28,29 +28,22 @@
 
         #contenedor-grafica { width: 100%; height: 350px; background: #fdfdfd; border: 2px solid #eee; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #bbb; font-size: 18px; margin-top: 10px; }
 
-        .live-status { color: #2ecc71; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; justify-content: center; margin: 5px 0 20px 0; }
+        .live-status { color: #2ecc71; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; justify-content: center; margin: 20px 0; }
         .dot { width: 10px; height: 10px; background: #2ecc71; border-radius: 50%; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        
-        .subtitulo-plus { font-size: 12px; color: #888; letter-spacing: 2px; font-weight: bold; margin-bottom: 15px; }
-        #login .subtitulo-plus, #ui-app .subtitulo-plus { margin-top: -10px; }
     </style>
 </head>
 <body>
 
-    <!-- PANTALLA LOGIN -->
     <div id="login" class="card-compacta">
-        <h2 style="color:var(--verde-oscuro); margin-top:0; margin-bottom:5px;">TERPAC USUARIO</h2>
-        <div class="subtitulo-plus">SEW-CONTROL PLUS</div>
+        <h2 style="color:var(--verde-oscuro); margin-top:0;">TERPAC USUARIO</h2>
         <input type="text" id="u" placeholder="Usuario">
         <input type="password" id="p" placeholder="Contraseña">
         <button class="btn" onclick="entrar()">INGRESAR</button>
     </div>
 
-    <!-- PANTALLA OPERADOR -->
     <div id="ui-app" class="card-compacta" style="display:none;">
-        <h3 style="margin-top:0; margin-bottom:5px; color:var(--verde-oscuro);">Captura Terpac</h3>
-        <div class="subtitulo-plus">SEW-CONTROL PLUS</div>
+        <h3 style="margin-top:0; color:var(--verde-oscuro);">Captura Terpac</h3>
         <input type="text" id="id-in" placeholder="ID PILOTO" oninput="check()">
         <div id="piloto-box"></div>
         
@@ -71,9 +64,7 @@
         <button class="btn-salir" onclick="location.reload()">CERRAR SESIÓN</button>
     </div>
 
-    <!-- PANTALLA SUPERVISOR -->
     <div id="ui-supervisor" class="card-full">
-        <div class="subtitulo-plus" style="margin-top: 10px; margin-bottom: 5px;">SEW-CONTROL PLUS</div>
         <div class="live-status"><div class="dot"></div> MONITOR TERPAC - PUERTO QUETZAL (EN VIVO)</div>
         
         <div class="pildoras-horizontal">
@@ -94,7 +85,8 @@
 
     <script>
         const pilotos = { "101": { n: "Juan Perez" }, "102": { n: "Pedro Marmol" } };
-        const URL_SCRIPT = 'https://script.google.com';
+        // URL ACTUALIZADA
+        const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbxYMpx1428fTz4g7esBgP5WLHFkm9kSZaIQjUFjDgGoMBMt5Emb1pSamzDOauCt7mE/exec';
 
         function entrar() {
             const user = document.getElementById('u').value.toLowerCase().trim();
@@ -115,12 +107,13 @@
 
         async function actualizarPildoras() {
             try {
+                // Hacemos una petición GET al script para obtener los conteos
                 const response = await fetch(URL_SCRIPT);
                 const data = await response.json();
                 document.getElementById('count-pendientes').innerText = data.pendientes.toString().padStart(2, '0');
                 document.getElementById('count-proceso').innerText = data.proceso.toString().padStart(2, '0');
                 document.getElementById('count-despachadas').innerText = data.despachadas.toString().padStart(2, '0');
-            } catch (e) { console.log("Error sincronizando pildoras"); }
+            } catch (e) { console.log("Error cargando pildoras"); }
         }
 
         function iniciarReloj() {
@@ -137,31 +130,25 @@
             if(pilotos[id]) { box.innerText = "👨‍✈️ Piloto: " + pilotos[id].n; box.style.display='block'; } else { box.style.display='none'; }
         }
 
-        async function enviar() {
+        function enviar() {
             const id = document.getElementById('id-in').value.trim();
             if(!pilotos[id]) return alert("ID no encontrado");
             const btn = document.getElementById('btn-env');
-            const mov = document.getElementById('mov').value;
-            const prod = document.getElementById('prod').value;
-            const textoFinal = `${mov} | ID: ${id} | Piloto: ${pilotos[id].n} | Prod: ${prod}`;
-
             btn.innerText = "Enviando..."; btn.disabled = true;
 
-            try {
-                await fetch(URL_SCRIPT, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: textoFinal
-                });
-                alert("✅ REGISTRO EXITOSO");
-                document.getElementById('id-in').value = "";
-                document.getElementById('piloto-box').style.display = 'none';
-            } catch (error) {
-                alert("Error de conexión");
-            } finally {
-                btn.innerText = "REGISTRAR DATOS 🚀";
-                btn.disabled = false;
-            }
+            const textoFinal = `ID: ${id} | Piloto: ${pilotos[id].n} | Mov: ${document.getElementById('mov').value} | Prod: ${document.getElementById('prod').value}`;
+
+            fetch(URL_SCRIPT, {
+                method: 'POST',
+                mode: 'no-cors', 
+                body: JSON.stringify({ "datos": textoFinal })
+            }).then(() => {
+                alert("✅ REGISTRO ENVIADO");
+                location.reload();
+            }).catch(err => {
+                alert("Error de envío.");
+                btn.disabled = false; btn.innerText = "REINTENTAR";
+            });
         }
     </script>
 </body>
